@@ -1,123 +1,79 @@
+
 #include "raylib.h"
-#include "raymath.h"
-#include <stdio.h>
+#include<stdio.h>
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 1200
+#define HEIGHT 1200
+#define SZ_WIDTH WIDTH //safezone_width
+#define SZ_HEIGHT 80 //safezone_height
+#define RIVER_WIDTH WIDTH
+#define RIVER_HEIGHT 400
+#define ROAD_WIDTH WIDTH
+#define ROAD_HEIGHT 400
 
-#define MAX_SPEED_X 300
-#define JUMP_SPEED 600
-#define GRAVITY 1700
+void DrawRoad(int X,int Y);
+void DrawSafezone(int X,int Y);
+void DrawRiver(int X,int Y);
+void DrawDestination(int X,int Y);
+void DrawDesBox(int X,int Y);
 
-#define LENGTH(arr) (sizeof(arr) / sizeof((arr)[0]))
+int main(void){
 
-int main(void) {
-  InitWindow(WIDTH, HEIGHT, "Game");
-  InitAudioDevice();
+  InitWindow(WIDTH,HEIGHT,"Frogger");
   SetTargetFPS(60);
 
-  float ground = 3.0 * HEIGHT / 4;
-
-  Vector2 position = {100, ground};
-
-  float w = 60;
-  bool flip = false;
-
-  Vector2 speed = Vector2Zero();
-  Vector2 gravity = {0, GRAVITY};
-
-  Texture2D idles[4];
-  Texture2D running[6];
-
-  Texture2D *sprites = idles;
-  int spriteIndex = 0;
-
-  for (int i = 0; i < LENGTH(idles); ++i) {
-    char path[50];
-    sprintf(path, "assets/sprites/player-idle-%d.png", i + 1);
-    idles[i] = LoadTexture(path);
-  }
-
-  for (int i = 0; i < LENGTH(running); ++i) {
-    char path[50];
-    sprintf(path, "assets/sprites/player-run-%d.png", i + 1);
-    running[i] = LoadTexture(path);
-  }
-
-  Sound jumpSound = LoadSound("assets/audio/jump.wav");
-
-  while (!WindowShouldClose()) {
-    float dt = GetFrameTime();
-
-    speed = Vector2Add(speed, Vector2Scale(gravity, dt));
-
-    position = Vector2Add(position, Vector2Scale(speed, dt));
-
-    if (position.y > ground) {
-      position.y = ground;
-      speed.y = 0;
-    }
-
-    if (position.x < 0) {
-      position.x = 0;
-    } else if (position.x + w > WIDTH)
-      position.x = WIDTH - w;
-
-    if (IsKeyDown(KEY_RIGHT)) {
-      speed.x = MAX_SPEED_X;
-      flip = false;
-      sprites = running;
-    } else if (IsKeyDown(KEY_LEFT)) {
-      speed.x = -MAX_SPEED_X;
-      flip = true;
-      sprites = running;
-    } else {
-      speed.x = 0;
-      sprites = idles;
-    }
-
-    if (IsKeyPressed(KEY_SPACE) && position.y == ground) {
-      speed.y = -JUMP_SPEED;
-      PlaySound(jumpSound);
-    }
-
+  while(!WindowShouldClose()){
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+    ClearBackground(BLACK);
 
-    Rectangle groundRect = {0, ground, WIDTH, HEIGHT - ground};
+    DrawSafezone(0,HEIGHT-160);
 
-    DrawTexturePro(sprites[spriteIndex],
-                   (Rectangle){0, 0,
-                               flip ? -sprites[0].width : sprites[0].width,
-                               sprites[0].height},
-                   (Rectangle){position.x, position.y - 96, 96, 96},
-                   Vector2Zero(), 0, WHITE);
+    DrawSafezone(0,HEIGHT-8*80);
+    DrawRiver(0,160);
+    DrawRoad(0,8*80);
+    
+    DrawRectangle(0,0,WIDTH,80,GREEN);
 
-    DrawRectangleRec(groundRect, GetColor(0x014B43FF));
-    DrawRectangleLinesEx(groundRect, 3, BLACK);
-
+    DrawDesBox(60,80);
+        
     EndDrawing();
 
-    int spritesSize = 0;
-    if (sprites == idles)
-      spritesSize = LENGTH(idles);
-    else if (sprites == running)
-      spritesSize = LENGTH(running);
-
-    spriteIndex = (int)(GetTime() / 0.1) % spritesSize;
   }
-
-  for (int i = 0; i < LENGTH(idles); ++i) {
-    UnloadTexture(idles[i]);
-  }
-  for (int i = 0; i < LENGTH(running); ++i) {
-    UnloadTexture(running[i]);
-  }
-
-  UnloadSound(jumpSound);
-  CloseAudioDevice();
 
   CloseWindow();
-
   return 0;
+
+
+
 }
+
+void DrawRoad(int X,int Y){
+
+  DrawRectangle(X,Y,ROAD_WIDTH,ROAD_HEIGHT,BLACK);
+
+}
+void DrawSafezone(int X,int Y){
+
+  DrawRectangle(X,Y,SZ_WIDTH,SZ_HEIGHT,PURPLE);
+
+}
+
+void DrawRiver(int X,int Y){
+
+  DrawRectangle(X,Y,RIVER_WIDTH,RIVER_HEIGHT,DARKBLUE);
+
+}
+
+void DrawDestination(int X, int Y){
+
+  DrawRectangle(X,Y,WIDTH,160,GREEN);
+}
+
+void DrawDesBox(int X,int Y){
+
+  for(int i=1;i<=5;i++){
+    DrawRectangle(((2*i-1)*120)-X,Y,120,80,GREEN);
+  }
+}
+
+

@@ -1,0 +1,11 @@
+# Compiled output
+build/
+*.exe
+*.o
+*.obj
+
+# VS Code settings (optional — keep if personal, remove if shared on purpose)
+.vscode/
+
+# OS junk files
+Thumbs.db
