@@ -13,7 +13,7 @@
 
 #define NUM_CARS 15
 #define NUM_LOGS 9
-#define NUM_TURTLES 6
+#define NUM_TURTLES 8
 
 typedef struct{
   Rectangle rect;
@@ -97,7 +97,8 @@ void DrawDesBox(int X,int Y){
 }
 
 void InitObstacles(){
-
+    
+        //CARS INITIALIZATION START//
     int car_index=0;
     for(int lane=0;lane<5;lane++){
 
@@ -111,6 +112,64 @@ void InitObstacles(){
             car_index++;
         }
     }
+        //CARS INITIALIZATION END//
+
+    //LOGS INITIALIZATION STARTS//
+
+    int log_index=0;
+
+    int lane_1_Y=415;
+    for(int i=0;i<3;i++){
+
+      int log_x=50+(i*400);
+      logs[log_index]=(Obstacle){(Rectangle){log_x,lane_1_Y,200,50},BROWN};
+      log_index++;
+
+    }
+
+    int lane_2_Y=415-80;
+    for(int i=0;i<3;i++){
+      int log_x=50+(i*650);
+      logs[log_index]=(Obstacle){(Rectangle){log_x,lane_2_Y,200.0*1.5*1.5,50},BROWN};
+      log_index++;
+
+    }
+
+    int lane_3_Y=415-80*3;
+
+    for(int i=0;i<3;i++){
+      int log_x=50+(i*500);
+      logs[log_index]=(Obstacle){(Rectangle){log_x,lane_3_Y,200*1.5,50},BROWN};
+
+      log_index++;
+    }
+
+    //LOGS INITIALIZATION ENDS//
+
+    //Turtles initialization Starts//
+
+    int turtle_index=0;
+
+    int lane_t_1_Y=415+80;
+
+    for(int i=0;i<4;i++){
+
+      int turtle_x=50+(i*300);
+      turtles[turtle_index]=(Obstacle){(Rectangle){turtle_x,lane_t_1_Y,200,50},DARKGREEN};
+      turtle_index++;
+    }
+
+    int lane_t_2_Y=415-80*2;
+
+    for(int i=0;i<4;i++){
+
+      int turtle_x=50+(i*275);
+      turtles[turtle_index]=(Obstacle){(Rectangle){turtle_x,lane_t_2_Y,200*(2.0/3),50},DARKGREEN};
+      turtle_index++;
+    }
+
+    //Turtles INITIALIZATION ENDS//
+
 
 }
 
@@ -120,5 +179,12 @@ void DrawObstacles(){
         DrawRectangleRec(cars[i].rect,cars[i].color);
     }
 
+    for(int i=0;i<NUM_LOGS;i++){
+       DrawRectangleRec(logs[i].rect,logs[i].color);
+    }
+    
+    for(int i=0;i<NUM_TURTLES;i++){
+      DrawRectangleRec(turtles[i].rect,turtles[i].color);
+    }
 }
 
