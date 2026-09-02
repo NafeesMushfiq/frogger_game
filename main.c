@@ -17,6 +17,7 @@
 
 typedef struct{
   Rectangle rect;
+  float speed;
   Color color;
 } Obstacle;
 
@@ -32,6 +33,7 @@ void DrawDesBox(int X,int Y);
 
 void InitObstacles();
 void DrawObstacles();
+void UpdateObstacles();
 
 int main(void){
 
@@ -42,7 +44,11 @@ int main(void){
 
 
   while(!WindowShouldClose()){
+
+    UpdateObstacles();
+
     BeginDrawing();
+
     ClearBackground(BLACK);
 
     DrawSafezone(0,HEIGHT-160);
@@ -99,15 +105,20 @@ void DrawDesBox(int X,int Y){
 void InitObstacles(){
     
         //CARS INITIALIZATION START//
+    
+    
     int car_index=0;
     for(int lane=0;lane<5;lane++){
 
         int lane_Y=640+(lane*80)+15;
 
+        float car_speed=(lane%2) ? 2.5f : -2.2F;
+        // Even len --->left direction jabe, Odd len--> right e jabe
+
         for(int i=0;i<3;i++){
             int car_X=50+(i*400);
 
-            cars[car_index]= (Obstacle){(Rectangle){car_X, lane_Y,100,50},RED};
+            cars[car_index]= (Obstacle){(Rectangle){car_X, lane_Y,100,50},car_speed,RED};
 
             car_index++;
         }
@@ -115,6 +126,7 @@ void InitObstacles(){
         //CARS INITIALIZATION END//
 
     //LOGS INITIALIZATION STARTS//
+    float log_speed=2.5f; // log movement---> right direction
 
     int log_index=0;
 
@@ -122,7 +134,8 @@ void InitObstacles(){
     for(int i=0;i<3;i++){
 
       int log_x=50+(i*400);
-      logs[log_index]=(Obstacle){(Rectangle){log_x,lane_1_Y,200,50},BROWN};
+
+      logs[log_index]=(Obstacle){(Rectangle){log_x,lane_1_Y,200,50},log_speed,BROWN};
       log_index++;
 
     }
@@ -130,7 +143,7 @@ void InitObstacles(){
     int lane_2_Y=415-80;
     for(int i=0;i<3;i++){
       int log_x=50+(i*650);
-      logs[log_index]=(Obstacle){(Rectangle){log_x,lane_2_Y,200.0*1.5*1.5,50},BROWN};
+      logs[log_index]=(Obstacle){(Rectangle){log_x,lane_2_Y,200.0*1.5*1.5,50},log_speed,BROWN};
       log_index++;
 
     }
@@ -139,7 +152,7 @@ void InitObstacles(){
 
     for(int i=0;i<3;i++){
       int log_x=50+(i*500);
-      logs[log_index]=(Obstacle){(Rectangle){log_x,lane_3_Y,200*1.5,50},BROWN};
+      logs[log_index]=(Obstacle){(Rectangle){log_x,lane_3_Y,200*1.5,50},log_speed,BROWN};
 
       log_index++;
     }
@@ -147,7 +160,7 @@ void InitObstacles(){
     //LOGS INITIALIZATION ENDS//
 
     //Turtles initialization Starts//
-
+    float turtle_speed=-3.0f; // left direction
     int turtle_index=0;
 
     int lane_t_1_Y=415+80;
@@ -155,7 +168,7 @@ void InitObstacles(){
     for(int i=0;i<4;i++){
 
       int turtle_x=50+(i*300);
-      turtles[turtle_index]=(Obstacle){(Rectangle){turtle_x,lane_t_1_Y,200,50},DARKGREEN};
+      turtles[turtle_index]=(Obstacle){(Rectangle){turtle_x,lane_t_1_Y,200,50},turtle_speed,DARKGREEN};
       turtle_index++;
     }
 
@@ -164,7 +177,7 @@ void InitObstacles(){
     for(int i=0;i<4;i++){
 
       int turtle_x=50+(i*275);
-      turtles[turtle_index]=(Obstacle){(Rectangle){turtle_x,lane_t_2_Y,200*(2.0/3),50},DARKGREEN};
+      turtles[turtle_index]=(Obstacle){(Rectangle){turtle_x,lane_t_2_Y,200*(2.0/3),50},turtle_speed,DARKGREEN};
       turtle_index++;
     }
 
@@ -186,5 +199,58 @@ void DrawObstacles(){
     for(int i=0;i<NUM_TURTLES;i++){
       DrawRectangleRec(turtles[i].rect,turtles[i].color);
     }
+}
+
+void UpdateObstacles(){
+
+
+  // Cars movement 
+  float car_lane_speed[15]={-0.5,-0.5,-0.5,0,0,0,-0.5,-0.5,-0.5,0,0,0,0,0,0};
+ 
+  for(int i=0;i<NUM_CARS;i++){
+
+    cars[i].rect.x+=cars[i].speed+car_lane_speed[i];
+
+    if(cars[i].speed>0 && cars[i].rect.x>WIDTH+300){ //right side e screen er baire gele abr left side e car width poriman baire theke start hbe abr
+      cars[i].rect.x=-cars[i].rect.width;      
+    }
+
+    if(cars[i].speed<0 && cars[i].rect.x<-cars[i].rect.width-300){ //left side e screen er baire car width poriman gele right side theke shuru hbe
+      cars[i].rect.x=WIDTH;
+    }
+
+    
+  }
+
+  //Logs movement
+
+  float log_lane_speed[9]={0,0,0,1,1,1,0.5,0.5,0.5};
+  float log_extra_space[9]={300,300,300,675,675,675,425,425,425};
+  
+
+  for(int i=0;i<NUM_LOGS;i++){
+
+    logs[i].rect.x+=logs[i].speed+log_lane_speed[i];
+
+    if(logs[i].speed>0 && logs[i].rect.x>WIDTH+300){
+      
+      logs[i].rect.x=-logs[i].rect.width;
+
+    }
+  }
+
+  // Turtles Movement
+  
+  for(int i=0;i<NUM_TURTLES;i++){
+
+    turtles[i].rect.x+=turtles[i].speed;
+
+    if(turtles[i].speed<0 && turtles[i].rect.x<-turtles[i].rect.width){
+
+      turtles[i].rect.x=WIDTH;
+    }
+
+  }
+  
 }
 
