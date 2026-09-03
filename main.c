@@ -225,7 +225,7 @@ void UpdateObstacles(){
   //Logs movement
 
   float log_lane_speed[9]={0,0,0,1,1,1,0.5,0.5,0.5};
-  float log_extra_space[9]={300,300,300,675,675,675,425,425,425};
+  float log_extra_space[9]={300,300,300,675,675,675,425,425,425}; //monitor er baire gele pore reappear er somoy extra space create hoi sejnne
   
 
   for(int i=0;i<NUM_LOGS;i++){
