@@ -41,11 +41,23 @@ void DrawDesBox(int X,int Y);
 void InitObstacles();
 void DrawObstacles();
 void UpdateObstacles();
+
 //frog functions
 void InitFrog();
 void UpdateFrogInput();
 void DrawFrog();
 
+//collision check func
+void CheckVehiclecollision(Obstacle cars[], int num_cars);
+void CheckRiverLogic(Obstacle logs[], int num_logs, Obstacle turtles[], int num_turtles);
+
+//destination check and score check func
+void CheckDestinationLogic();
+
+
+//score and live initialization
+int score = 0;
+int lives = 3;
 
 int main(void){
 
@@ -59,6 +71,13 @@ int main(void){
 
     UpdateObstacles();
     UpdateFrogInput();
+
+
+    CheckVehiclecollision(cars, NUM_CARS);//road collision check
+    CheckRiverLogic(logs, NUM_LOGS, turtles, NUM_TURTLES);//river collision check
+
+    CheckDestinationLogic();//box e bosche ki na and score check 
+
 
     BeginDrawing();
 
@@ -75,6 +94,9 @@ int main(void){
     DrawDesBox(60,80);
     DrawObstacles();
     DrawFrog();
+
+    DrawText(TextFormat("Score : %d", score), 40, HEIGHT-60, 35, YELLOW);
+    DrawText(TextFormat("LIVES :%d",lives),WIDTH-220, HEIGHT-60, 35, RED);
         
     EndDrawing();
 
@@ -311,5 +333,93 @@ void UpdateFrogInput(){
 
 void DrawFrog(){
     DrawRectangleRec(frog.rect, frog.color);
+}
+
+//Road collision check and reset position
+void CheckVehiclecollision(Obstacle cars[], int num_cars){
+for (int i=0;i<num_cars; i++){
+  //collision check korar jonno raylib er built in func use. jodi collision hoy taile initial position theke start hobe . 
+  if (CheckCollisionRecs(frog.rect, cars[i].rect)){
+      InitFrog();
+      break;
+  }
+}
+}
+
+
+//River collision check: jodi log ba turtle er upr thake taile safe, na hoile mara.
+void CheckRiverLogic(Obstacle logs[], int num_logs, Obstacle turtles[], int num_turtles){
+
+ //river boundary
+  float river_top = 160.0f;
+  float river_bottom = 560.0f;
+
+  //frog river er vitore ase ki na check kora 
+  if(frog.rect.y >= river_top && frog.rect.y < river_bottom){
+    bool on_safe_platform = false;
+
+    //frog log er upr ase ki na check kora
+    for(int i=0; i< num_logs; i++){
+      if(CheckCollisionRecs(frog.rect, logs[i].rect)){
+        on_safe_platform = true;
+
+        frog.rect.x += logs[i].speed;//log er speed er sathe frog k move koranu
+        break;
+      }
+    }
+
+    //frog turtle er upr ase ki na check kora (jdi already kunu log e na thake)
+  if(!on_safe_platform){
+    for(int i=0; i< num_turtles; i++){
+      if(CheckCollisionRecs(frog.rect, turtles[i].rect)){
+        on_safe_platform = true;
+
+        frog.rect.x += turtles[i].speed;//turtle er speed er sathe frog k move koranu
+        break;
+      }
+    }
+  }
+  
+
+    //boundary check: jodi log e bose frog log er sathe screen er baire chole jay taile mara
+    if(frog.rect.x<0 || frog.rect.x + frog.rect.width>WIDTH){
+      InitFrog();//tokhon abar prothom theke start hobe
+    }
+
+    //river e ase but log/turtle er upr nai : tibro mara
+    if (!on_safe_platform){
+      InitFrog();//tokhon abar prothom theke start hobe.
+    }
+  }
+ 
+
+}
+
+//destination reach check and score update
+void CheckDestinationLogic(){
+  //top destination zone y limit(y<160)
+  if(frog.rect.y < 160.0f){
+    bool hit_destination_box =false;
+
+
+    //drawbox er 5 ti box boundary check
+    for(int i=0; i<=5; i++){
+      float box_x = ((2*i-1)*120)-60;
+      Rectangle desBox = (Rectangle){box_x, 80, 120, 80};
+
+      if(CheckCollisionRecs(frog.rect, desBox)){
+        hit_destination_box = true;
+        score += 100; //win score
+        InitFrog();// abr reset hobe
+        break;
+
+      }
+    }
+
+    //green box miss hit korle (box miss korle)
+    if(!hit_destination_box){
+      InitFrog();//game abr suru theke reset hobe
+    }
+  }
 }
 
